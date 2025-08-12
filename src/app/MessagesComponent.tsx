@@ -1,6 +1,7 @@
 "use client";
 
 import MarkdownWrapper from "@/components/MarkdownWrapper";
+import TypewriterEffect from "@/components/TypewriterEffect";
 
 import { Message } from "@/models/modelTypes";
 import { EditorContextValue } from "@tiptap/react";
@@ -83,8 +84,16 @@ function MessagesComponent({
                     : " text-white "
                 }`}
               >
-                {/* {message.content} */}
-                <MarkdownWrapper content={message.content} />
+                {message.role === "user" ? (
+                  <MarkdownWrapper content={message.content} />
+                ) : (
+                  <TypewriterEffect
+                    content={message.content}
+                    isStreaming={isFetchingChatResponse && messages[messages.length - 1]?.id === message.id}
+                    messageId={String(message.id)}
+                    speed={15}
+                  />
+                )}
               </div>
               <div className="bg-[#202020] flex justify-between items-center gap-3 p-3 w-24 rounded">
                 <CopyIcon size={14} /> <ArrowDownToLine size={14} />{" "}
