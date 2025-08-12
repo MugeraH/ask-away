@@ -1,5 +1,6 @@
-// UPDATED IMPLEMENTATION - Using latest @google/genai SDK
+// UPDATED IMPLEMENTATION - Using latest @google/genai SDK with ai/react compatibility
 import { GoogleGenAI } from "@google/genai";
+import { StreamingTextResponse } from "ai";
 
 // IMPORTANT! Set the runtime to edge
 export const runtime = "edge";
@@ -57,14 +58,16 @@ export async function POST(req: Request) {
       contents: contents,
     });
 
-    // Create a readable stream for the response
-    const encoder = new TextEncoder();
+    // Create a readable stream compatible with ai/react
     const stream = new ReadableStream({
       async start(controller) {
+        const encoder = new TextEncoder();
         try {
           for await (const chunk of response) {
             if (chunk.text) {
-              controller.enqueue(encoder.encode(chunk.text));
+              // Format for ai/react compatibility
+              const formattedChunk = `0:"${chunk.text.replace(/"/g, '\\"').replace(/\n/g, '\\n')}"\n`;
+              controller.enqueue(encoder.encode(formattedChunk));
             }
           }
           controller.close();
@@ -75,13 +78,7 @@ export async function POST(req: Request) {
       },
     });
 
-    return new Response(stream, {
-      headers: {
-        "Content-Type": "text/plain; charset=utf-8",
-        "Cache-Control": "no-cache",
-        "Connection": "keep-alive",
-      },
-    });
+    return new StreamingTextResponse(stream);
 
   } catch (error) {
     console.error("API Error:", error);

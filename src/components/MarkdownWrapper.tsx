@@ -1,5 +1,4 @@
-import ReactDOMServer from "react-dom/server";
-
+import React from "react";
 import markdownit from "markdown-it";
 import DOMPurify from "dompurify";
 import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -24,6 +23,8 @@ import ruby from "react-syntax-highlighter/dist/esm/languages/prism/ruby";
 import swift from "react-syntax-highlighter/dist/esm/languages/prism/swift";
 import scala from "react-syntax-highlighter/dist/esm/languages/prism/scala";
 import rust from "react-syntax-highlighter/dist/esm/languages/prism/rust";
+import c from "react-syntax-highlighter/dist/esm/languages/prism/c";
+
 
 // Register languages
 SyntaxHighlighter.registerLanguage("jsx", jsx);
@@ -40,6 +41,7 @@ SyntaxHighlighter.registerLanguage("ruby", ruby);
 SyntaxHighlighter.registerLanguage("swift", swift);
 SyntaxHighlighter.registerLanguage("scala", scala);
 SyntaxHighlighter.registerLanguage("rust", rust);
+SyntaxHighlighter.registerLanguage("c++", c);
 
 const supportedLanguages = [
   "javascript",
@@ -47,7 +49,6 @@ const supportedLanguages = [
   "jsx",
   "csharp",
   "css",
-  "c++",
   "go",
   "java",
   "typescript",
@@ -57,61 +58,126 @@ const supportedLanguages = [
   "swift",
   "scala",
   "rust",
+  "c++",
 ];
 
+// Create markdown-it instance without custom highlighting
+// We'll handle code blocks separately in React
 const md = new markdownit({
   html: true,
-  highlight: function (str, lang): string {
-    if (lang && supportedLanguages.includes(lang)) {
-      try {
-        const HighlightedCode = () => (
-          <SyntaxHighlighter language={lang} style={prism}>
-            {str}
-          </SyntaxHighlighter>
-        );
-
-        return ReactDOMServer.renderToString(<HighlightedCode />);
-      } catch (error) {
-        console.error("Syntax highlighting failed for language:", lang, error);
-      }
-    }
-    return `<pre class="overflow-x-auto"><code>${md.utils.escapeHtml(
-      str
-    )}</code></pre>`;
-  },
+  breaks: true,
+  linkify: true,
 });
 
+// Custom component to render code blocks with syntax highlighting
+const CodeBlock = ({ children, language }: { children: string; language?: string }) => {
+  const lang = language?.toLowerCase();
+  
+  if (lang && supportedLanguages.includes(lang)) {
+    return (
+      <div className="my-4">
+        <SyntaxHighlighter
+          language={lang}
+          style={prism}
+          customStyle={{
+            margin: 0,
+            borderRadius: '0.375rem',
+            fontSize: '0.875rem',
+          }}
+          showLineNumbers={true}
+          wrapLines={true}
+        >
+          {children}
+        </SyntaxHighlighter>
+      </div>
+    );
+  }
+
+  // Fallback for unsupported languages
+  return (
+    <pre className="bg-gray-800 text-gray-100 p-4 rounded-md overflow-x-auto my-4">
+      <code>{children}</code>
+    </pre>
+  );
+};
+
+// Parse markdown and extract code blocks for separate rendering
+const parseMarkdownWithCodeBlocks = (content: string) => {
+  if (!content || typeof content !== "string") {
+    return [];
+  }
+
+  const parts: Array<{ type: 'text' | 'code'; content: string; language?: string }> = [];
+  const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
+  let lastIndex = 0;
+  let match;
+
+  while ((match = codeBlockRegex.exec(content)) !== null) {
+    // Add text before code block
+    if (match.index > lastIndex) {
+      const textContent = content.slice(lastIndex, match.index);
+      if (textContent.trim()) {
+        parts.push({ type: 'text', content: textContent });
+      }
+    }
+
+    // Add code block
+    parts.push({
+      type: 'code',
+      content: match[2].trim(),
+      language: match[1] || 'text'
+    });
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  // Add remaining text
+  if (lastIndex < content.length) {
+    const remainingContent = content.slice(lastIndex);
+    if (remainingContent.trim()) {
+      parts.push({ type: 'text', content: remainingContent });
+    }
+  }
+
+  return parts;
+};
+
 function MarkdownWrapper({ content }: Props) {
-  const renderContent = () => {
-    if (content == null) {
-      console.warn("MarkdownWrapper received null or undefined content");
-      return "";
-    }
+  if (content == null) {
+    console.warn("MarkdownWrapper received null or undefined content");
+    return <div className="text-gray-500">No content to display</div>;
+  }
 
-    if (typeof content !== "string") {
-      console.error("MarkdownWrapper received non-string content:", content);
-      return "Error: Invalid content type";
-    }
+  if (typeof content !== "string") {
+    console.error("MarkdownWrapper received non-string content:", content);
+    return <div className="text-red-500">Error: Invalid content type</div>;
+  }
 
-    // Check if the content is HTML
-    const isHTML = /<[a-z][\s\S]*>/i.test(content);
-
-    if (isHTML) {
-      // If it's HTML, sanitize it directly
-      return DOMPurify.sanitize(content);
-    } else {
-      // If it's Markdown, render it to HTML and then sanitize
-      const htmlContent = md.render(content);
-      return DOMPurify.sanitize(htmlContent);
-    }
-  };
+  const parts = parseMarkdownWithCodeBlocks(content);
 
   return (
     <div className="markdown-body overflow-x-hidden">
-      <div
-        className=" max-w-none overflow-x-auto"
-        dangerouslySetInnerHTML={{ __html: renderContent() }}
-      />
+      {parts.map((part, index) => {
+        if (part.type === 'code') {
+          return (
+            <CodeBlock key={index} language={part.language}>
+              {part.content}
+            </CodeBlock>
+          );
+        } else {
+          // Render markdown text (excluding code blocks)
+          const htmlContent = md.render(part.content);
+          const sanitizedHtml = DOMPurify.sanitize(htmlContent);
+          
+          return (
+            <div
+              key={index}
+              className="max-w-none overflow-x-auto"
+              dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
+            />
+          );
+        }
+      })}
     </div>
   );
 }

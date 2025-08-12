@@ -13,10 +13,12 @@ type Props = {
   setContent?: React.Dispatch<React.SetStateAction<string>>;
   editor: EditorContextValue | null;
   isFetchingChatResponse: boolean;
+  error: Error | null;
 };
 function MessagesComponent({
   messages,
   messagesEndRef,
+  error,
 
   isFetchingChatResponse,
 }: Props) {
@@ -53,9 +55,17 @@ function MessagesComponent({
           </div>
         </div>
 
+        {error && (
+          <div className="mt-2 p-3 bg-red-900/20 border border-red-500/50 rounded-md">
+            <p className="text-red-400 text-sm">
+              Error:{" "}
+              {error.message || "Something went wrong. Please try again."}
+            </p>
+          </div>
+        )}
+
         {messages.map((message) => (
           <div
-          
             key={message.id}
             className={`flex ${
               message.role === "user" ? "justify-end" : "justify-start"
@@ -87,7 +97,6 @@ function MessagesComponent({
         {isFetchingChatResponse && (
           <div
             key="loading"
-         
             className={`flex flex-col gap-4 justify-start mt-5  `}
           >
             <div className="flex items-end gap-1  my-1  h-5">

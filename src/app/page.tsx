@@ -17,14 +17,25 @@ function Home() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading, stop } =
-    useChat({
-      api: "api/googleGenAi",
-    });
+  const {
+    messages,
+    input,
+    handleInputChange,
+    handleSubmit,
+    isLoading,
+    stop,
+    error,
+  } = useChat({
+    api: "api/googleGenAi",
+    onError: (error) => {
+      console.error("Chat error:", error);
+    },
+  });
 
-  const handleKeyPress = (event: { keyCode: number; which: number }) => {
-    // look for the `Enter` keyCode
-    if (event.keyCode === 13 || event.which === 13) {
+  const handleKeyPress = (event: React.KeyboardEvent) => {
+    // Use modern key property instead of deprecated keyCode
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
       handleSubmit();
     }
   };
@@ -32,20 +43,23 @@ function Home() {
   React.useEffect(scrollToBottom, [messages]);
 
   return (
-    <div className=" w-full min-h-screen relative  ">
+    <div className="w-full min-h-screen relative">
       <Topbar />
 
-      <div className="mt-2 h-full w-[90%] mx-auto py-3  ">
-        <div className=" w-full max-h-[calc(100vh-15rem)] h-[calc(100vh-15rem)] ">
+      <div className="mt-2 h-full w-[90%] mx-auto py-3">
+        {/* Error display */}
+
+        <div className="w-full max-h-[calc(100vh-15rem)] h-[calc(100vh-15rem)]">
           <MessagesComponent
             messages={messages}
             messagesEndRef={messagesEndRef}
             isFetchingChatResponse={isLoading}
             editor={editor}
+            error={error || null}
           />
         </div>
 
-        <div className="flex flex-col mt-3 z-100 w-[90%] absolute bottom-5 bg-[#121212]">
+        <div className="flex flex-col mt-3 z-[100] w-[90%] absolute bottom-5 bg-[#121212]">
           <EditorComponent
             value={input}
             isFetchingChatResponse={isLoading}
