@@ -1,7 +1,7 @@
 "use client";
 
 import MarkdownWrapper from "@/components/MarkdownWrapper";
-import TypewriterEffect from "@/components/TypewriterEffect";
+import StreamingMessage from "@/components/TypewriterEffect";
 
 import { Message } from "@/models/modelTypes";
 import { EditorContextValue } from "@tiptap/react";
@@ -87,11 +87,9 @@ function MessagesComponent({
                 {message.role === "user" ? (
                   <MarkdownWrapper content={message.content} />
                 ) : (
-                  <TypewriterEffect
+                  <StreamingMessage
                     content={message.content}
                     isStreaming={isFetchingChatResponse && messages[messages.length - 1]?.id === message.id}
-                    messageId={String(message.id)}
-                    speed={15}
                   />
                 )}
               </div>
