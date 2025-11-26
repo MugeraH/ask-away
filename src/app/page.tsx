@@ -1,6 +1,6 @@
 "use client";
 import { Menubar, MenubarMenu, MenubarTrigger } from "@/components/ui/menubar";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+// import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import React from "react";
 import EditorComponent from "./EditorComponent";

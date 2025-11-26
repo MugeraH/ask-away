@@ -2,7 +2,7 @@
 import React from "react";
 
 // import Editor from "@/components/Editor/AdvancedEditor";
-import { Command, Send, SquareSlash, Loader2 } from "lucide-react";
+import { Command, Send,  Loader2 } from "lucide-react";
 
 type Props = {
   value: string;
