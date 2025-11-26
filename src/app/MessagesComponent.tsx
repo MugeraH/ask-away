@@ -45,8 +45,8 @@ function MessagesComponent({
               </div>
             </div>
             <p className="text-lg leading-relaxed text-app-secondary font-light">
-              I'm your expert APM accounting tutor. Ask me anything about
-              Advanced Performance Management, and I'll provide structured,
+              I&apos;m your expert APM accounting tutor. Ask me anything about
+              Advanced Performance Management, and I&apos;ll provide structured,
               concise answers to help you excel in your studies.
             </p>
 
