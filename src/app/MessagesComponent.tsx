@@ -1,7 +1,6 @@
 "use client";
 
 import MarkdownWrapper from "@/components/MarkdownWrapper";
-import StreamingMessage from "@/components/TypewriterEffect";
 
 import { Message } from "@/models/modelTypes";
 import { EditorContextValue } from "@tiptap/react";
@@ -24,99 +23,125 @@ function MessagesComponent({
   isFetchingChatResponse,
 }: Props) {
   return (
-    <div className="flex flex-col justify-end w-full h-full overflow-y-auto  space-y-4">
-      <div className="px-2  py-2 flex flex-col overflow-y-auto ">
-        {/* <div className={`flex justify-start`}>
-          <div className={`max-w-3xl p-4  text-md bg-[#15272A] rounded-md`}>
-            <h4 className="text-[#969696] text-sm font-semibold">
-              DEFAULT PERSONA
-            </h4>
-            <p className="text-md mt-2 font-semibold">
-              World-Class React/Front-End Developer
+    <div className="flex flex-col justify-end w-full h-full overflow-y-auto bg-app-primary">
+      <div className="px-6 py-8 flex flex-col overflow-y-auto space-y-10">
+        {/* Welcome Message */}
+        <div className="flex justify-start">
+          <div className="max-w-4xl py-8 flex flex-col gap-4">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-8 h-8 bg-app-accent rounded-full flex items-center justify-center">
+                <Dot size={20} className="text-white" />
+              </div>
+              <div>
+                <h4 className="text-app-secondary text-sm font-medium flex items-center gap-2">
+                  ASK AWAY ASSISTANT
+                  <span className="px-2 py-1 bg-app-elevated text-app-accent text-xs rounded-app-sm font-semibold">
+                    APM Tutor
+                  </span>
+                </h4>
+                <p className="text-app-muted text-xs mt-1">
+                  Powered by Gemini 2.5 Flash
+                </p>
+              </div>
+            </div>
+            <p className="text-lg leading-relaxed text-app-secondary font-light">
+              I'm your expert APM accounting tutor. Ask me anything about
+              Advanced Performance Management, and I'll provide structured,
+              concise answers to help you excel in your studies.
             </p>
-          </div>
-        </div> */}
 
-        <div className={`flex justify-start`}>
-          <div
-            className={`max-w-3xl py-4  text-md rounded-md flex flex-col gap-2 justify-start`}
-          >
-            <h4 className="text-[#969696] text-sm font-semibold flex items-center">
-              ASK AWAY ASSISTANT <Dot /> ChadGPT 4o
-            </h4>
-            <p className="text-sm ">
-              How can I help you today to ensure your prompts yield the best
-              possible results
-            </p>
-
-            <div className="bg-[#202020] flex justify-between items-center gap-3 p-3 w-24 rounded">
-              <CopyIcon size={14} /> <ArrowDownToLine size={14} />{" "}
-              <Split size={14} className="rotate-90" />{" "}
+            <div className="bg-app-tertiary hover:bg-app-elevated transition-all duration-200 flex justify-between items-center gap-3 p-3 rounded-app-lg border border-app-primary shadow-app-sm mt-4">
+              <CopyIcon
+                size={16}
+                className="text-app-muted hover:text-app-accent cursor-pointer transition-colors"
+              />
+              <ArrowDownToLine
+                size={16}
+                className="text-app-muted hover:text-app-accent cursor-pointer transition-colors"
+              />
+              <Split
+                size={16}
+                className="rotate-90 text-app-muted hover:text-app-accent cursor-pointer transition-colors"
+              />
             </div>
           </div>
         </div>
 
         {error && (
-          <div className="mt-2 p-3 bg-red-900/20 border border-red-500/50 rounded-md">
-            <p className="text-red-400 text-sm">
-              Error:{" "}
-              {error.message || "Something went wrong. Please try again."}
-            </p>
+          <div className="mx-auto max-w-4xl p-4 bg-red-500/10 border border-red-500/20 rounded-app-lg backdrop-blur-sm shadow-app-md">
+            <div className="flex items-center gap-3">
+              <div className="w-6 h-6 bg-red-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-red-400 text-xs font-bold">!</span>
+              </div>
+              <p className="text-red-300 text-sm leading-relaxed">
+                <span className="font-medium">Error:</span>{" "}
+                {error.message || "Something went wrong. Please try again."}
+              </p>
+            </div>
           </div>
         )}
 
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`flex ${
-              message.role === "user" ? "justify-end" : "justify-start"
-            } gap-10  mt-6 `}
-          >
+        {messages
+          .filter((message) => {
+            // Show all user messages and completed assistant messages
+            if (message.role === "user") return true;
+            // Hide the currently loading assistant message
+            return (
+              !isFetchingChatResponse ||
+              messages[messages.length - 1]?.id !== message.id
+            );
+          })
+          .map((message) => (
             <div
-              className={`flex flex-col ${
-                message.role === "user" ? "items-end" : ""
-              } gap-2`}
+              key={message.id}
+              className={`flex ${
+                message.role === "user" ? "justify-end" : "justify-start"
+              } w-full`}
             >
               <div
-                className={`max-w-3xl text-sm  rounded-lg ${
-                  message.role === "user"
-                    ? "bg-[#202020] text-white p-5"
-                    : " text-white "
-                }`}
+                className={`flex flex-col ${
+                  message.role === "user" ? "items-end" : "items-start"
+                } gap-5 max-w-4xl w-full`}
               >
-                {message.role === "user" ? (
+                <div
+                  className={`text-base leading-relaxed rounded-app-xl shadow-app-md ${
+                    message.role === "user"
+                      ? "bg-app-accent border border-blue-500/20 text-white px-6 py-5 ml-12"
+                      : "bg-app-tertiary border border-app-primary text-app-primary px-8 py-6 mr-12 space-y-4"
+                  }`}
+                >
                   <MarkdownWrapper content={message.content} />
-                ) : (
-                  <StreamingMessage
-                    content={message.content}
-                    isStreaming={isFetchingChatResponse && messages[messages.length - 1]?.id === message.id}
-                  />
-                )}
-              </div>
-              <div className="bg-[#202020] flex justify-between items-center gap-3 p-3 w-24 rounded">
-                <CopyIcon size={14} /> <ArrowDownToLine size={14} />{" "}
-                <Split size={14} className="rotate-90 cursor-pointer" />
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
 
         {isFetchingChatResponse && (
           <div
             key="loading"
-            className={`flex flex-col gap-4 justify-start mt-5  `}
+            className="flex justify-start w-full animate-in fade-in duration-300"
           >
-            <div className="flex items-end gap-1  my-1  h-5">
-              <div className="h-2 w-2 bg-white rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-              <div className="h-2 w-2 bg-white rounded-full animate-bounce [animation-delay:-0.10s]"></div>
-              <div className="h-2 w-2 bg-white rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-              <div className="h-2 w-2 bg-white rounded-full animate-bounce"></div>
+            <div className="flex flex-col gap-5 max-w-4xl w-full mr-12">
+              <div className="bg-app-tertiary border border-app-primary rounded-app-xl px-8 py-6 shadow-app-md animate-pulse">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 h-6">
+                    <div className="h-3 w-3 bg-app-accent rounded-full animate-pulse [animation-delay:-0.4s] [animation-duration:1.5s]"></div>
+                    <div className="h-3 w-3 bg-app-accent/80 rounded-full animate-pulse [animation-delay:-0.2s] [animation-duration:1.5s]"></div>
+                    <div className="h-3 w-3 bg-app-accent/60 rounded-full animate-pulse [animation-delay:0s] [animation-duration:1.5s]"></div>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-app-secondary text-sm font-medium animate-pulse">
+                      APM Tutor is analyzing your question...
+                    </span>
+                    <div className="flex gap-1">
+                      <div className="h-1 w-8 bg-app-accent/30 rounded-full animate-pulse [animation-delay:-0.1s]"></div>
+                      <div className="h-1 w-12 bg-app-accent/20 rounded-full animate-pulse [animation-delay:-0.3s]"></div>
+                      <div className="h-1 w-6 bg-app-accent/10 rounded-full animate-pulse [animation-delay:-0.5s]"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-
-            {/* <div className="bg-[#202020] flex justify-between items-center gap-2 p-3 w-24 rounded">
-              <CopyIcon size={14} /> <ArrowDownToLine size={14} />{" "}
-              <Split size={14} className="rotate-90" />
-            </div> */}
           </div>
         )}
 

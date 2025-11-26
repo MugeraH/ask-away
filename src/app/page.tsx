@@ -49,7 +49,7 @@ function Home() {
       <div className="mt-2 h-full w-[90%] mx-auto py-3">
         {/* Error display */}
 
-        <div className="w-full max-h-[calc(100vh-15rem)] h-[calc(100vh-15rem)]">
+        <div className="w-full max-h-[calc(100vh-15rem)] h-[calc(100vh-15rem)] bg-pink-400">
           <MessagesComponent
             messages={messages}
             messagesEndRef={messagesEndRef}
@@ -59,7 +59,7 @@ function Home() {
           />
         </div>
 
-        <div className="flex flex-col mt-3 z-[100] w-[90%] absolute bottom-5 bg-[#121212]">
+        <div className="flex flex-col mt-6 z-[100] w-[90%] absolute bottom-5 ">
           <EditorComponent
             value={input}
             isFetchingChatResponse={isLoading}
@@ -79,20 +79,20 @@ const Topbar = () => {
     <div className="w-full py-[14px] px-4 flex justify-between items-center border-b border-[#202020]">
       <h4 className="text-md font-semibold">Model Search</h4>
       <div className="hidden md:block ">
-        <Tabs defaultValue="sequential" className="w-[400px]">
+        {/* <Tabs defaultValue="sequential" className="w-[400px]">
           <TabsList>
             <TabsTrigger value="stream">Stream</TabsTrigger>
             <TabsTrigger value="parallel">Parallel</TabsTrigger>
             <TabsTrigger value="sequential">Sequential</TabsTrigger>
           </TabsList>
-        </Tabs>
+        </Tabs> */}
       </div>
 
       <div className="flex items-center gap-3 ">
         <Menubar className="border-none w-[150px] p-0">
           <MenubarMenu>
             <MenubarTrigger className="text-sm w-full justify-between py-3.5 px-2.5">
-              ChatGPT 4o
+              Gemini 2.5
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="white"
