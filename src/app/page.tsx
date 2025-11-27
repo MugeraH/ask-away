@@ -40,7 +40,24 @@ function Home() {
     }
   };
 
-  React.useEffect(scrollToBottom, [messages]);
+  // Enhanced scroll to bottom that waits for animations to complete
+  React.useEffect(() => {
+    // Delay scroll to allow Framer Motion animations to complete
+    const timer = setTimeout(() => {
+      scrollToBottom();
+    }, 500); // Wait for animation duration + buffer
+
+    return () => clearTimeout(timer);
+  }, [messages]);
+
+  // Also scroll when loading state changes (when response starts/ends)
+  React.useEffect(() => {
+    if (isLoading) {
+      // Scroll immediately when loading starts
+      const timer = setTimeout(scrollToBottom, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading]);
 
   return (
     <div className="w-full min-h-screen relative">

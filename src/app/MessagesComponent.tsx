@@ -4,6 +4,8 @@ import MarkdownWrapper from "@/components/MarkdownWrapper";
 
 import { Message } from "@/models/modelTypes";
 import { EditorContextValue } from "@tiptap/react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
 
 import { Dot } from "lucide-react";
 
@@ -22,12 +24,37 @@ function MessagesComponent({
 
   isFetchingChatResponse,
 }: Props) {
+  const [loadingMessage, setLoadingMessage] = useState("");
+
+  const loadingMessages = [
+    "Great question! Unlike your last exam grade, this one's going places! 📈",
+    "Your brain cells are working harder than a CFO during audit season! 🧠",
+    "At least someone's asking the right questions... unlike management! 🤔",
+    "This question is more balanced than most company budgets! ⚖️",
+    "You're building APM skills faster than companies build debt! 💪",
+    "Your curiosity > Your procrastination (finally!) 🎯",
+    "Plot twist: You're actually learning something today! 📚",
+    "This question won't haunt you like variance analysis nightmares! 👻",
+    "Congrats! You've asked a question that won't make your tutor cry! 🎉",
+    "Your APM knowledge is growing... unlike your sleep schedule! 😴",
+  ];
+
+  // Set random message when loading starts
+  useEffect(() => {
+    if (isFetchingChatResponse && !loadingMessage) {
+      const randomMessage =
+        loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
+      setLoadingMessage(randomMessage);
+    } else if (!isFetchingChatResponse) {
+      setLoadingMessage("");
+    }
+  }, [isFetchingChatResponse]);
   return (
     <div className="flex flex-col justify-end w-full h-full overflow-y-auto bg-app-primary">
       <div className="px-6 py-8 flex flex-col overflow-y-auto space-y-10">
         {/* Welcome Message */}
         <div className="flex justify-start">
-          <div className="max-w-4xl py-8 flex flex-col gap-4">
+          <div className="max-w-5xl py-8 flex flex-col gap-4">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-8 h-8 bg-app-accent rounded-full flex items-center justify-center">
                 <Dot size={20} className="text-white" />
@@ -68,7 +95,7 @@ function MessagesComponent({
         </div>
 
         {error && (
-          <div className="mx-auto max-w-4xl p-4 bg-red-500/10 border border-red-500/20 rounded-app-lg backdrop-blur-sm shadow-app-md">
+          <div className="mx-auto max-w-5xl p-4 bg-red-500/10 border border-red-500/20 rounded-app-lg backdrop-blur-sm shadow-app-md">
             <div className="flex items-center gap-3">
               <div className="w-6 h-6 bg-red-500/20 rounded-full flex items-center justify-center flex-shrink-0">
                 <span className="text-red-400 text-xs font-bold">!</span>
@@ -91,9 +118,16 @@ function MessagesComponent({
               messages[messages.length - 1]?.id !== message.id
             );
           })
-          .map((message) => (
-            <div
+          .map((message, index) => (
+            <motion.div
               key={message.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.4,
+                delay: index * 0.1,
+                ease: "easeOut",
+              }}
               className={`flex ${
                 message.role === "user" ? "justify-end" : "justify-start"
               } w-full`}
@@ -101,9 +135,12 @@ function MessagesComponent({
               <div
                 className={`flex flex-col ${
                   message.role === "user" ? "items-end" : "items-start"
-                } gap-5 max-w-4xl w-full`}
+                } gap-5 max-w-5xl w-full`}
               >
-                <div
+                <motion.div
+                  initial={{ scale: 0.95 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 + 0.1 }}
                   className={`text-base leading-relaxed rounded-app-xl shadow-app-md ${
                     message.role === "user"
                       ? "bg-app-accent border border-blue-500/20 text-white px-6 py-5 ml-12"
@@ -111,52 +148,78 @@ function MessagesComponent({
                   }`}
                 >
                   <MarkdownWrapper content={message.content} />
-                </div>
+                </motion.div>
               </div>
-            </div>
+            </motion.div>
           ))}
 
-        {isFetchingChatResponse && (
-          <div
-            key="loading"
-            className="flex justify-start w-full animate-in fade-in duration-300"
-          >
-            <div className="flex flex-col gap-5 max-w-4xl w-full mr-12">
-              <div className="bg-app-tertiary border border-app-primary rounded-app-xl px-8 py-6 shadow-app-md w-full ">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2 h-6 ">
-                    <div className="h-3 w-3 bg-white rounded-full animate-pulse [animation-delay:-0.4s] [animation-duration:1.5s]"></div>
-                    <div className="h-3 w-3 bg-white/80 rounded-full animate-pulse [animation-delay:-0.2s] [animation-duration:1.5s]"></div>
-                    <div className="h-3 w-3 bg-white/60 rounded-full animate-pulse [animation-delay:0s] [animation-duration:1.5s]"></div>
-                  </div>
-                  <div className="flex justify-between flex-wrap gap-1 items-center  w-full">
-                    <span className="text-app-secondary text-sm pt-1 font-medium animate-pulse">
-                      Analyzing your question...
-                    </span>
-                    <div className=" text-center">
-                      <p className="text-app-muted text-sm italic ">
-                        {
-                          [
-                            "Great question! Unlike your last exam grade, this one's going places! 📈",
-                            "Your brain cells are working harder than a CFO during audit season! 🧠",
-                            "At least someone's asking the right questions... unlike management! 🤔",
-                            "This question is more balanced than most company budgets! ⚖️",
-                            "You're building APM skills faster than companies build debt! 💪",
-                            "Your curiosity > Your procrastination (finally!) 🎯",
-                            "Plot twist: You're actually learning something today! 📚",
-                            "This question won't haunt you like variance analysis nightmares! 👻",
-                            "Congrats! You've asked a question that won't make your tutor cry! 🎉",
-                            "Your APM knowledge is growing... unlike your sleep schedule! 😴",
-                          ][Math.floor(Math.random() * 10)]
-                        }
-                      </p>
+        <AnimatePresence>
+          {isFetchingChatResponse && (
+            <motion.div
+              key="loading"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="flex justify-start w-full"
+            >
+              <div className="flex flex-col gap-5 max-w-5xl w-full mr-12">
+                <motion.div
+                  initial={{ scale: 0.95 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.4, delay: 0.1 }}
+                  className="bg-app-tertiary border border-app-primary rounded-app-xl px-8 py-6 shadow-app-md w-full"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 h-6">
+                      <motion.div
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{
+                          duration: 1.5,
+                          repeat: Infinity,
+                          delay: 0,
+                        }}
+                        className="h-3 w-3 bg-white rounded-full"
+                      />
+                      <motion.div
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{
+                          duration: 1.5,
+                          repeat: Infinity,
+                          delay: 0.2,
+                        }}
+                        className="h-3 w-3 bg-white/80 rounded-full"
+                      />
+                      <motion.div
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{
+                          duration: 1.5,
+                          repeat: Infinity,
+                          delay: 0.4,
+                        }}
+                        className="h-3 w-3 bg-white/60 rounded-full"
+                      />
+                    </div>
+                    <div className="flex justify-between flex-wrap gap-1 items-center w-full">
+                      <motion.span
+                        animate={{ opacity: [0.7, 1, 0.7] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                        className="text-app-secondary text-sm pt-1 font-medium"
+                      >
+                        Analyzing your question...
+                      </motion.span>
+                      <div className="text-center">
+                        <p className="text-app-muted text-sm italic">
+                          {loadingMessage}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               </div>
-            </div>
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div ref={messagesEndRef} />
       </div>
