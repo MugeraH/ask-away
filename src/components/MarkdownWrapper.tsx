@@ -3,6 +3,8 @@ import markdownit from "markdown-it";
 import DOMPurify from "dompurify";
 import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
 import { prism } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { InlineMath, BlockMath } from "react-katex";
+import "katex/dist/katex.min.css";
 
 type Props = {
   content: string;
@@ -101,19 +103,21 @@ const CodeBlock = ({ children, language }: { children: string; language?: string
   );
 };
 
-// Parse markdown and extract code blocks for separate rendering
-const parseMarkdownWithCodeBlocks = (content: string) => {
+// Parse markdown and extract code blocks and math equations for separate rendering
+const parseMarkdownWithSpecialBlocks = (content: string) => {
   if (!content || typeof content !== "string") {
     return [];
   }
 
-  const parts: Array<{ type: 'text' | 'code'; content: string; language?: string }> = [];
-  const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
+  const parts: Array<{ type: 'text' | 'code' | 'math-block' | 'math-inline'; content: string; language?: string }> = [];
+  
+  // Combined regex for code blocks, display math, and inline math
+  const combinedRegex = /(```(\w+)?\n([\s\S]*?)```)|(\$\$[\s\S]*?\$\$)|(\$[^$\n]+?\$)/g;
   let lastIndex = 0;
   let match;
 
-  while ((match = codeBlockRegex.exec(content)) !== null) {
-    // Add text before code block
+  while ((match = combinedRegex.exec(content)) !== null) {
+    // Add text before special block
     if (match.index > lastIndex) {
       const textContent = content.slice(lastIndex, match.index);
       if (textContent.trim()) {
@@ -121,12 +125,26 @@ const parseMarkdownWithCodeBlocks = (content: string) => {
       }
     }
 
-    // Add code block
-    parts.push({
-      type: 'code',
-      content: match[2].trim(),
-      language: match[1] || 'text'
-    });
+    if (match[1]) {
+      // Code block
+      parts.push({
+        type: 'code',
+        content: match[3].trim(),
+        language: match[2] || 'text'
+      });
+    } else if (match[4]) {
+      // Display math ($$...$$)
+      parts.push({
+        type: 'math-block',
+        content: match[4].slice(2, -2).trim()
+      });
+    } else if (match[5]) {
+      // Inline math ($...$)
+      parts.push({
+        type: 'math-inline',
+        content: match[5].slice(1, -1).trim()
+      });
+    }
 
     lastIndex = match.index + match[0].length;
   }
@@ -153,7 +171,7 @@ function MarkdownWrapper({ content }: Props) {
     return <div className="text-red-500">Error: Invalid content type</div>;
   }
 
-  const parts = parseMarkdownWithCodeBlocks(content);
+  const parts = parseMarkdownWithSpecialBlocks(content);
 
   return (
     <div className="markdown-body overflow-x-hidden">
@@ -164,8 +182,20 @@ function MarkdownWrapper({ content }: Props) {
               {part.content}
             </CodeBlock>
           );
+        } else if (part.type === 'math-block') {
+          return (
+            <div key={index} className="my-4 text-center">
+              <BlockMath math={part.content} />
+            </div>
+          );
+        } else if (part.type === 'math-inline') {
+          return (
+            <span key={index} className="inline-block">
+              <InlineMath math={part.content} />
+            </span>
+          );
         } else {
-          // Render markdown text (excluding code blocks)
+          // Render markdown text (excluding code blocks and math)
           const htmlContent = md.render(part.content);
           const sanitizedHtml = DOMPurify.sanitize(htmlContent);
           
