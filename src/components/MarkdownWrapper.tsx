@@ -8,6 +8,7 @@ import "katex/dist/katex.min.css";
 
 type Props = {
   content: string;
+  theme?: "light" | "dark";
 };
 
 // Import languages
@@ -26,7 +27,6 @@ import swift from "react-syntax-highlighter/dist/esm/languages/prism/swift";
 import scala from "react-syntax-highlighter/dist/esm/languages/prism/scala";
 import rust from "react-syntax-highlighter/dist/esm/languages/prism/rust";
 import c from "react-syntax-highlighter/dist/esm/languages/prism/c";
-
 
 // Register languages
 SyntaxHighlighter.registerLanguage("jsx", jsx);
@@ -72,9 +72,15 @@ const md = new markdownit({
 });
 
 // Custom component to render code blocks with syntax highlighting
-const CodeBlock = ({ children, language }: { children: string; language?: string }) => {
+const CodeBlock = ({
+  children,
+  language,
+}: {
+  children: string;
+  language?: string;
+}) => {
   const lang = language?.toLowerCase();
-  
+
   if (lang && supportedLanguages.includes(lang)) {
     return (
       <div className="my-4">
@@ -83,8 +89,8 @@ const CodeBlock = ({ children, language }: { children: string; language?: string
           style={prism}
           customStyle={{
             margin: 0,
-            borderRadius: '0.375rem',
-            fontSize: '0.875rem',
+            borderRadius: "0.375rem",
+            fontSize: "0.875rem",
           }}
           showLineNumbers={true}
           wrapLines={true}
@@ -109,10 +115,15 @@ const parseMarkdownWithSpecialBlocks = (content: string) => {
     return [];
   }
 
-  const parts: Array<{ type: 'text' | 'code' | 'math-block' | 'math-inline'; content: string; language?: string }> = [];
-  
+  const parts: Array<{
+    type: "text" | "code" | "math-block" | "math-inline";
+    content: string;
+    language?: string;
+  }> = [];
+
   // Combined regex for code blocks, display math, and inline math
-  const combinedRegex = /(```(\w+)?\n([\s\S]*?)```)|(\$\$[\s\S]*?\$\$)|(\$[^$\n]+?\$)/g;
+  const combinedRegex =
+    /(```(\w+)?\n([\s\S]*?)```)|(\$\$[\s\S]*?\$\$)|(\$[^$\n]+?\$)/g;
   let lastIndex = 0;
   let match;
 
@@ -121,28 +132,28 @@ const parseMarkdownWithSpecialBlocks = (content: string) => {
     if (match.index > lastIndex) {
       const textContent = content.slice(lastIndex, match.index);
       if (textContent.trim()) {
-        parts.push({ type: 'text', content: textContent });
+        parts.push({ type: "text", content: textContent });
       }
     }
 
     if (match[1]) {
       // Code block
       parts.push({
-        type: 'code',
+        type: "code",
         content: match[3].trim(),
-        language: match[2] || 'text'
+        language: match[2] || "text",
       });
     } else if (match[4]) {
       // Display math ($$...$$)
       parts.push({
-        type: 'math-block',
-        content: match[4].slice(2, -2).trim()
+        type: "math-block",
+        content: match[4].slice(2, -2).trim(),
       });
     } else if (match[5]) {
       // Inline math ($...$)
       parts.push({
-        type: 'math-inline',
-        content: match[5].slice(1, -1).trim()
+        type: "math-inline",
+        content: match[5].slice(1, -1).trim(),
       });
     }
 
@@ -153,14 +164,14 @@ const parseMarkdownWithSpecialBlocks = (content: string) => {
   if (lastIndex < content.length) {
     const remainingContent = content.slice(lastIndex);
     if (remainingContent.trim()) {
-      parts.push({ type: 'text', content: remainingContent });
+      parts.push({ type: "text", content: remainingContent });
     }
   }
 
   return parts;
 };
 
-function MarkdownWrapper({ content }: Props) {
+function MarkdownWrapper({ content, theme = "light" }: Props) {
   if (content == null) {
     console.warn("MarkdownWrapper received null or undefined content");
     return <div className="text-gray-500">No content to display</div>;
@@ -173,72 +184,98 @@ function MarkdownWrapper({ content }: Props) {
 
   const parts = parseMarkdownWithSpecialBlocks(content);
 
+  // Define colors based on theme
+  const colors =
+    theme === "dark"
+      ? {
+          h1: "#60a5fa",
+          h2: "#34d399",
+          h3: "#f87171",
+          h4: "#a78bfa",
+          h5h6: "#fb923c",
+          strong: "#f9fafb",
+          em: "#d1d5db",
+          text: "#f9fafb",
+        }
+      : {
+          h1: "#3b82f6",
+          h2: "#059669",
+          h3: "#dc2626",
+          h4: "#7c3aed",
+          h5h6: "#ea580c",
+          strong: "#1f2937",
+          em: "#4b5563",
+          text: "#374151",
+        };
+
   return (
     <div className="markdown-body overflow-x-hidden prose prose-slate max-w-none">
       <style jsx>{`
         .markdown-body h1 {
-          color: #3b82f6;
+          color: ${colors.h1};
           font-size: 1.5rem;
           font-weight: 700;
-          margin-bottom: 1rem;
-          margin-top: 1.5rem;
+          margin-bottom: 0.5rem;
+          margin-top: 0.75rem;
           border-bottom: 2px solid #e2e8f0;
           padding-bottom: 0.5rem;
         }
         .markdown-body h2 {
-          color: #059669;
+          color: ${colors.h2};
           font-size: 1.25rem;
           font-weight: 600;
-          margin-bottom: 0.75rem;
-          margin-top: 1.25rem;
+          margin-bottom: 0.5rem;
+          margin-top: 0.75rem;
         }
         .markdown-body h3 {
-          color: #dc2626;
+          color: ${colors.h3};
           font-size: 1.125rem;
           font-weight: 600;
-          margin-bottom: 0.5rem;
-          margin-top: 1rem;
+          margin-bottom: 0.25rem;
+          margin-top: 0.5rem;
         }
         .markdown-body h4 {
-          color: #7c3aed;
+          color: ${colors.h4};
           font-size: 1rem;
           font-weight: 600;
-          margin-bottom: 0.5rem;
-          margin-top: 0.75rem;
+          margin-bottom: 0.25rem;
+          margin-top: 0.5rem;
         }
-        .markdown-body h5, .markdown-body h6 {
-          color: #ea580c;
+        .markdown-body h5,
+        .markdown-body h6 {
+          color: ${colors.h5h6};
           font-size: 0.875rem;
           font-weight: 600;
-          margin-bottom: 0.5rem;
-          margin-top: 0.75rem;
+          margin-bottom: 0.25rem;
+          margin-top: 0.5rem;
         }
         .markdown-body strong {
-          color: #1f2937;
+          color: ${colors.strong};
           font-weight: 700;
         }
         .markdown-body em {
-          color: #4b5563;
+          color: ${colors.em};
           font-style: italic;
         }
-        .markdown-body ul, .markdown-body ol {
-          margin: 0.75rem 0;
+        .markdown-body ul,
+        .markdown-body ol {
+          margin: 0.5rem 0;
           padding-left: 1.5rem;
         }
         .markdown-body li {
-          margin: 0.25rem 0;
+          margin: 0.125rem 0;
           line-height: 1.6;
         }
         .markdown-body blockquote {
           border-left: 4px solid #3b82f6;
           background: #f8fafc;
-          padding: 1rem;
-          margin: 1rem 0;
+          padding: 0.75rem;
+          margin: 0.75rem 0;
           border-radius: 0.375rem;
         }
         .markdown-body table {
           border-collapse: collapse;
-          margin: 1rem 0;
+          margin: 0.75rem 0;
           width: 100%;
         }
         .markdown-body th {
@@ -253,26 +290,36 @@ function MarkdownWrapper({ content }: Props) {
           padding: 0.75rem;
         }
         .markdown-body p {
-          margin: 0.75rem 0;
+          margin: 0.25rem 0;
           line-height: 1.7;
+          color: ${colors.text};
+        }
+        .markdown-body {
+          color: ${colors.text};
         }
       `}</style>
       {parts.map((part, index) => {
-        if (part.type === 'code') {
+        if (part.type === "code") {
           return (
             <CodeBlock key={index} language={part.language}>
               {part.content}
             </CodeBlock>
           );
-        } else if (part.type === 'math-block') {
+        } else if (part.type === "math-block") {
           return (
-            <div key={index} className="my-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-center">
+            <div
+              key={index}
+              className="my-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-center"
+            >
               <BlockMath math={part.content} />
             </div>
           );
-        } else if (part.type === 'math-inline') {
+        } else if (part.type === "math-inline") {
           return (
-            <span key={index} className="inline-block px-1 py-0.5 bg-blue-100 rounded">
+            <span
+              key={index}
+              className="inline-block px-1 py-0.5 bg-blue-100 rounded"
+            >
               <InlineMath math={part.content} />
             </span>
           );
@@ -280,7 +327,7 @@ function MarkdownWrapper({ content }: Props) {
           // Render markdown text (excluding code blocks and math)
           const htmlContent = md.render(part.content);
           const sanitizedHtml = DOMPurify.sanitize(htmlContent);
-          
+
           return (
             <div
               key={index}

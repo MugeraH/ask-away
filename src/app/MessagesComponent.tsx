@@ -144,11 +144,14 @@ function MessagesComponent({
                   transition={{ duration: 0.3, delay: index * 0.1 + 0.1 }}
                   className={`text-base leading-relaxed rounded-app-xl shadow-app-md transition-all duration-200 hover:shadow-lg ${
                     message.role === "user"
-                      ? "bg-gradient-to-r from-blue-600 to-blue-700 border border-blue-500/30 text-white px-6 py-5 ml-12 shadow-blue-500/20"
-                      : "bg-gradient-to-br from-slate-50 to-white border border-slate-200/60 text-slate-800 px-8 py-6 mr-12 space-y-4 shadow-slate-200/40"
+                      ? "bg-gradient-to-r from-slate-700 to-slate-800 border border-slate-600/30 text-white px-6 py-5 ml-12 shadow-slate-500/20"
+                      : "bg-gradient-to-br from-slate-50 to-white border border-slate-200/60 text-slate-800 px-6 py-4 mr-12 space-y-4 shadow-slate-200/40"
                   }`}
                 >
-                  <MarkdownWrapper content={processChunkedContent(message.content)} />
+                  <MarkdownWrapper
+                    content={processChunkedContent(message.content)}
+                    theme={message.role === "user" ? "dark" : "light"}
+                  />
                 </motion.div>
               </div>
             </motion.div>
@@ -169,7 +172,7 @@ function MessagesComponent({
                   initial={{ scale: 0.95 }}
                   animate={{ scale: 1 }}
                   transition={{ duration: 0.4, delay: 0.1 }}
-                  className="bg-gradient-to-br from-slate-50 to-white border border-slate-200/60 rounded-app-xl px-8 py-6 shadow-lg shadow-slate-200/40 w-full"
+                  className="bg-gradient-to-br from-slate-50 to-white border border-slate-200/60 rounded-app-xl px-4 py-4 shadow-lg shadow-slate-200/40 w-full"
                 >
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2 h-6">
