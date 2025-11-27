@@ -1,10 +1,11 @@
-declare module 'react-katex' {
-  import { ComponentType } from 'react';
+declare module "react-katex" {
+  import { ComponentType } from "react";
 
   interface MathProps {
     math: string;
     errorColor?: string;
     renderError?: (error: Error) => React.ReactNode;
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
     settings?: any;
   }
 
