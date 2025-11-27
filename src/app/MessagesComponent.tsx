@@ -5,7 +5,7 @@ import MarkdownWrapper from "@/components/MarkdownWrapper";
 import { Message } from "@/models/modelTypes";
 import { EditorContextValue } from "@tiptap/react";
 
-import { CopyIcon, ArrowDownToLine, Split, Dot } from "lucide-react";
+import { Dot } from "lucide-react";
 
 type Props = {
   messages: Message[];
