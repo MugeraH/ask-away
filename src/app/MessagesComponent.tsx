@@ -49,7 +49,7 @@ function MessagesComponent({
               Advanced Performance Management, and I&apos;ll provide structured,
               concise answers to help you excel in your studies.
             </p>
-
+            {/* 
             <div className="bg-app-tertiary hover:bg-app-elevated transition-all duration-200 flex justify-between items-center gap-3 p-3 rounded-app-lg border border-app-primary shadow-app-sm mt-4">
               <CopyIcon
                 size={16}
@@ -63,7 +63,7 @@ function MessagesComponent({
                 size={16}
                 className="rotate-90 text-app-muted hover:text-app-accent cursor-pointer transition-colors"
               />
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -122,21 +122,34 @@ function MessagesComponent({
             className="flex justify-start w-full animate-in fade-in duration-300"
           >
             <div className="flex flex-col gap-5 max-w-4xl w-full mr-12">
-              <div className="bg-app-tertiary border border-app-primary rounded-app-xl px-8 py-6 shadow-app-md animate-pulse">
+              <div className="bg-app-tertiary border border-app-primary rounded-app-xl px-8 py-6 shadow-app-md w-full ">
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2 h-6">
-                    <div className="h-3 w-3 bg-app-accent rounded-full animate-pulse [animation-delay:-0.4s] [animation-duration:1.5s]"></div>
-                    <div className="h-3 w-3 bg-app-accent/80 rounded-full animate-pulse [animation-delay:-0.2s] [animation-duration:1.5s]"></div>
-                    <div className="h-3 w-3 bg-app-accent/60 rounded-full animate-pulse [animation-delay:0s] [animation-duration:1.5s]"></div>
+                  <div className="flex items-center gap-2 h-6 ">
+                    <div className="h-3 w-3 bg-white rounded-full animate-pulse [animation-delay:-0.4s] [animation-duration:1.5s]"></div>
+                    <div className="h-3 w-3 bg-white/80 rounded-full animate-pulse [animation-delay:-0.2s] [animation-duration:1.5s]"></div>
+                    <div className="h-3 w-3 bg-white/60 rounded-full animate-pulse [animation-delay:0s] [animation-duration:1.5s]"></div>
                   </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-app-secondary text-sm font-medium animate-pulse">
-                      APM Tutor is analyzing your question...
+                  <div className="flex justify-between flex-wrap gap-1 items-center  w-full">
+                    <span className="text-app-secondary text-sm pt-1 font-medium animate-pulse">
+                      Analyzing your question...
                     </span>
-                    <div className="flex gap-1">
-                      <div className="h-1 w-8 bg-app-accent/30 rounded-full animate-pulse [animation-delay:-0.1s]"></div>
-                      <div className="h-1 w-12 bg-app-accent/20 rounded-full animate-pulse [animation-delay:-0.3s]"></div>
-                      <div className="h-1 w-6 bg-app-accent/10 rounded-full animate-pulse [animation-delay:-0.5s]"></div>
+                    <div className=" text-center">
+                      <p className="text-app-muted text-sm italic ">
+                        {
+                          [
+                            "Great question! Unlike your last exam grade, this one's going places! 📈",
+                            "Your brain cells are working harder than a CFO during audit season! 🧠",
+                            "At least someone's asking the right questions... unlike management! 🤔",
+                            "This question is more balanced than most company budgets! ⚖️",
+                            "You're building APM skills faster than companies build debt! 💪",
+                            "Your curiosity > Your procrastination (finally!) 🎯",
+                            "Plot twist: You're actually learning something today! 📚",
+                            "This question won't haunt you like variance analysis nightmares! 👻",
+                            "Congrats! You've asked a question that won't make your tutor cry! 🎉",
+                            "Your APM knowledge is growing... unlike your sleep schedule! 😴",
+                          ][Math.floor(Math.random() * 10)]
+                        }
+                      </p>
                     </div>
                   </div>
                 </div>
