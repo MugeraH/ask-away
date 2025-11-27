@@ -1,6 +1,7 @@
 "use client";
 
 import MarkdownWrapper from "@/components/MarkdownWrapper";
+import { processChunkedContent } from "@/utils/processChunkedContent";
 
 import { Message } from "@/models/modelTypes";
 import { EditorContextValue } from "@tiptap/react";
@@ -141,13 +142,13 @@ function MessagesComponent({
                   initial={{ scale: 0.95 }}
                   animate={{ scale: 1 }}
                   transition={{ duration: 0.3, delay: index * 0.1 + 0.1 }}
-                  className={`text-base leading-relaxed rounded-app-xl shadow-app-md ${
+                  className={`text-base leading-relaxed rounded-app-xl shadow-app-md transition-all duration-200 hover:shadow-lg ${
                     message.role === "user"
-                      ? "bg-app-accent border border-blue-500/20 text-white px-6 py-5 ml-12"
-                      : "bg-app-tertiary border border-app-primary text-app-primary px-8 py-6 mr-12 space-y-4"
+                      ? "bg-gradient-to-r from-blue-600 to-blue-700 border border-blue-500/30 text-white px-6 py-5 ml-12 shadow-blue-500/20"
+                      : "bg-gradient-to-br from-slate-50 to-white border border-slate-200/60 text-slate-800 px-8 py-6 mr-12 space-y-4 shadow-slate-200/40"
                   }`}
                 >
-                  <MarkdownWrapper content={message.content} />
+                  <MarkdownWrapper content={processChunkedContent(message.content)} />
                 </motion.div>
               </div>
             </motion.div>
@@ -168,7 +169,7 @@ function MessagesComponent({
                   initial={{ scale: 0.95 }}
                   animate={{ scale: 1 }}
                   transition={{ duration: 0.4, delay: 0.1 }}
-                  className="bg-app-tertiary border border-app-primary rounded-app-xl px-8 py-6 shadow-app-md w-full"
+                  className="bg-gradient-to-br from-slate-50 to-white border border-slate-200/60 rounded-app-xl px-8 py-6 shadow-lg shadow-slate-200/40 w-full"
                 >
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2 h-6">
@@ -179,7 +180,7 @@ function MessagesComponent({
                           repeat: Infinity,
                           delay: 0,
                         }}
-                        className="h-3 w-3 bg-white rounded-full"
+                        className="h-3 w-3 bg-blue-500 rounded-full"
                       />
                       <motion.div
                         animate={{ scale: [1, 1.2, 1] }}
@@ -188,7 +189,7 @@ function MessagesComponent({
                           repeat: Infinity,
                           delay: 0.2,
                         }}
-                        className="h-3 w-3 bg-white/80 rounded-full"
+                        className="h-3 w-3 bg-blue-400 rounded-full"
                       />
                       <motion.div
                         animate={{ scale: [1, 1.2, 1] }}
@@ -197,19 +198,19 @@ function MessagesComponent({
                           repeat: Infinity,
                           delay: 0.4,
                         }}
-                        className="h-3 w-3 bg-white/60 rounded-full"
+                        className="h-3 w-3 bg-blue-300 rounded-full"
                       />
                     </div>
                     <div className="flex justify-between flex-wrap gap-1 items-center w-full">
                       <motion.span
                         animate={{ opacity: [0.7, 1, 0.7] }}
                         transition={{ duration: 2, repeat: Infinity }}
-                        className="text-app-secondary text-sm pt-1 font-medium"
+                        className="text-slate-700 text-sm pt-1 font-medium"
                       >
                         Analyzing your question...
                       </motion.span>
                       <div className="text-center">
-                        <p className="text-app-muted text-sm italic">
+                        <p className="text-slate-500 text-sm italic">
                           {loadingMessage}
                         </p>
                       </div>

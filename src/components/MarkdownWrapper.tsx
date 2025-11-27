@@ -174,7 +174,89 @@ function MarkdownWrapper({ content }: Props) {
   const parts = parseMarkdownWithSpecialBlocks(content);
 
   return (
-    <div className="markdown-body overflow-x-hidden">
+    <div className="markdown-body overflow-x-hidden prose prose-slate max-w-none">
+      <style jsx>{`
+        .markdown-body h1 {
+          color: #3b82f6;
+          font-size: 1.5rem;
+          font-weight: 700;
+          margin-bottom: 1rem;
+          margin-top: 1.5rem;
+          border-bottom: 2px solid #e2e8f0;
+          padding-bottom: 0.5rem;
+        }
+        .markdown-body h2 {
+          color: #059669;
+          font-size: 1.25rem;
+          font-weight: 600;
+          margin-bottom: 0.75rem;
+          margin-top: 1.25rem;
+        }
+        .markdown-body h3 {
+          color: #dc2626;
+          font-size: 1.125rem;
+          font-weight: 600;
+          margin-bottom: 0.5rem;
+          margin-top: 1rem;
+        }
+        .markdown-body h4 {
+          color: #7c3aed;
+          font-size: 1rem;
+          font-weight: 600;
+          margin-bottom: 0.5rem;
+          margin-top: 0.75rem;
+        }
+        .markdown-body h5, .markdown-body h6 {
+          color: #ea580c;
+          font-size: 0.875rem;
+          font-weight: 600;
+          margin-bottom: 0.5rem;
+          margin-top: 0.75rem;
+        }
+        .markdown-body strong {
+          color: #1f2937;
+          font-weight: 700;
+        }
+        .markdown-body em {
+          color: #4b5563;
+          font-style: italic;
+        }
+        .markdown-body ul, .markdown-body ol {
+          margin: 0.75rem 0;
+          padding-left: 1.5rem;
+        }
+        .markdown-body li {
+          margin: 0.25rem 0;
+          line-height: 1.6;
+        }
+        .markdown-body blockquote {
+          border-left: 4px solid #3b82f6;
+          background: #f8fafc;
+          padding: 1rem;
+          margin: 1rem 0;
+          border-radius: 0.375rem;
+        }
+        .markdown-body table {
+          border-collapse: collapse;
+          margin: 1rem 0;
+          width: 100%;
+        }
+        .markdown-body th {
+          background: #f1f5f9;
+          border: 1px solid #e2e8f0;
+          padding: 0.75rem;
+          font-weight: 600;
+          color: #1e293b;
+        }
+        .markdown-body td {
+          border: 1px solid #e2e8f0;
+          padding: 0.75rem;
+        }
+        .markdown-body p {
+          margin: 0.75rem 0;
+          line-height: 1.7;
+        }
+      `}</style>
       {parts.map((part, index) => {
         if (part.type === 'code') {
           return (
@@ -184,13 +266,13 @@ function MarkdownWrapper({ content }: Props) {
           );
         } else if (part.type === 'math-block') {
           return (
-            <div key={index} className="my-4 text-center">
+            <div key={index} className="my-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-center">
               <BlockMath math={part.content} />
             </div>
           );
         } else if (part.type === 'math-inline') {
           return (
-            <span key={index} className="inline-block">
+            <span key={index} className="inline-block px-1 py-0.5 bg-blue-100 rounded">
               <InlineMath math={part.content} />
             </span>
           );
